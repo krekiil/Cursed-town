@@ -9,6 +9,7 @@ int main()
     player.setFillColor(sf::Color::Red); // задаю цвет
     player.setOrigin({ 40.f, 40.f });   
     player.setPosition({ 960, 540 }); // спавн в центре
+    float speed = 0.2f; // скорость движения
 
         while (window.isOpen())
     {
@@ -17,7 +18,20 @@ int main()
         {
             if (event->is<sf::Event::Closed>())
                 window.close();
+
         }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+                player.move({ 0, -speed });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+                player.move({ 0, speed });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+                player.move({ -speed, 0 });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+                player.move({ speed, 0 });
+
 
 window.clear();
 window.draw(player);
