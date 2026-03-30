@@ -1,19 +1,33 @@
 #include "Player.hpp"
+
 using namespace sf;
-using namespace std;
 
-Player::Player() : speed(300.f)
+Player::Player():
+    currentFrame(0),
+    animationTimer(0.f),
+    animationSpeed(0.15f),
+    speed(300.f),
+    isMoving(false),
+    frameSize(43, 58)
 {
-    shape.setRadius(40.f);
-    shape.setFillColor(sf::Color::Red);
-    shape.setOrigin({ 40.f, 40.f });
-    shape.setPosition({ 960, 540 });
-}
+    texture.loadFromFile("assets/player.png");
 
+    sprite.setTextureRect(IntRect({ 0, 0 }, frameSize));
+
+    sprite.setOrigin(frameSize.x / 2.f, frameSize.y / 2.f);
+
+    sprite.setPosition({ 960, 540 });
+}
 void Player::handleInput(float dt)
 {
+    Vector2f movement(0.f, 0.f);
+    isMoving = false;
+
     if (Keyboard::isKeyPressed(Keyboard::Key::W))
-        shape.move({ 0, -speed * dt });
+    {
+        movement.y -= speed * dt;
+        isMoving = true;
+    }
 
     if (Keyboard::isKeyPressed(Keyboard::Key::S))
         shape.move({ 0, speed * dt });
