@@ -33,6 +33,7 @@ void Game::processEvents()
 void Game::update(float dt)
 {
     player.handleInput(dt);
+    player.update(dt);
 }
 
 void Game::render()

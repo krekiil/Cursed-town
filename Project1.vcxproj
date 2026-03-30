@@ -147,6 +147,9 @@
     <ClInclude Include="game.hpp" />
     <ClInclude Include="player.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\Player.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
