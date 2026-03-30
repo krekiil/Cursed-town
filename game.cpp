@@ -1,7 +1,11 @@
 #include "Game.hpp"
 #include <optional>
+
+using namespace sf;
+using namespace std;
+
 Game::Game()
-    : window(sf::VideoMode::getDesktopMode(), "CursedTown", sf::Style::None)
+    : window(VideoMode::getDesktopMode(), "CursedTown", Style::None)
 {
 }
 
@@ -19,9 +23,9 @@ void Game::run()
 
 void Game::processEvents()
 {
-    while (const std::optional event = window.pollEvent())
+    while (const optional event = window.pollEvent())
     {
-        if (event->is<sf::Event::Closed>())
+        if (event->is<Event::Closed>())
             window.close();
     }
 }

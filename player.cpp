@@ -1,4 +1,6 @@
 #include "Player.hpp"
+using namespace sf;
+using namespace std;
 
 Player::Player() : speed(300.f)
 {
@@ -10,20 +12,20 @@ Player::Player() : speed(300.f)
 
 void Player::handleInput(float dt)
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+    if (Keyboard::isKeyPressed(Keyboard::Key::W))
         shape.move({ 0, -speed * dt });
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+    if (Keyboard::isKeyPressed(Keyboard::Key::S))
         shape.move({ 0, speed * dt });
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+    if (Keyboard::isKeyPressed(Keyboard::Key::A))
         shape.move({ -speed * dt, 0 });
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+    if (Keyboard::isKeyPressed(Keyboard::Key::D))
         shape.move({ speed * dt, 0 });
 }
 
-void Player::draw(sf::RenderWindow& window)
+void Player::draw(RenderWindow& window)
 {
     window.draw(shape);
 }
