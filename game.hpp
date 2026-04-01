@@ -14,6 +14,7 @@ private:
 
     sf::RenderWindow window;
     sf::Clock clock;
+    sf::View view;
 
     Player player;
 };  

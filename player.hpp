@@ -8,6 +8,8 @@ class Player
 public:
     Player();
 
+    sf::Vector2f getPosition() const;
+
     void handleInput(float dt);
     void update(float dt);
     void draw(sf::RenderWindow& window);

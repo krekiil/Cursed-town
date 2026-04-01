@@ -7,6 +7,8 @@ using namespace std;
 Game::Game()
     : window(VideoMode::getDesktopMode(), "CursedTown", Style::None)
 {
+    view.setSize(sf::Vector2f(window.getSize()));
+    view.setCenter(sf::Vector2f(window.getSize()) / 2.f);
 }
 
 void Game::run()
@@ -34,11 +36,14 @@ void Game::update(float dt)
 {
     player.handleInput(dt);
     player.update(dt);
+
+    view.setCenter(player.getPosition());
 }
 
 void Game::render()
 {
     window.clear();
+    window.setView(view);
     player.draw(window);
     window.display();
 }

@@ -121,3 +121,7 @@ void Player::draw(RenderWindow& window)
 {
     window.draw(sprite);
 }
+Vector2f Player::getPosition() const
+{
+    return sprite.getPosition();
+}
