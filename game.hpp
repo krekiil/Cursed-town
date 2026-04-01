@@ -1,6 +1,8 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include "Player.hpp"
+#include "Map.hpp"
 
 class Game {
 public:
@@ -17,4 +19,5 @@ private:
     sf::View view;
 
     Player player;
-};  
+    Map map;
+};

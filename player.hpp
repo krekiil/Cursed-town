@@ -1,18 +1,17 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-extern std::vector<sf::Texture> frames;
-class Player
-{
+class Player {
 public:
     Player();
-
-    sf::Vector2f getPosition() const;
 
     void handleInput(float dt);
     void update(float dt);
     void draw(sf::RenderWindow& window);
+
+    sf::Vector2f getPosition() const;
 
 private:
     sf::Texture texture;
@@ -21,22 +20,18 @@ private:
     int currentFrame;
     float animationTimer;
     float animationSpeed;
+
     float speed;
     bool isMoving;
 
     sf::Vector2i frameSize;
     sf::Vector2i frameSpacing;
+
     int framesPerRow;
     std::vector<int> rightRowOffsets;
+
     sf::Image textureImage;
 
-    enum Direction
-    {
-        Down,
-        Up,
-        Left,
-        Right
-    };
-
+    enum Direction { Down, Up, Left, Right };
     Direction direction;
 };
