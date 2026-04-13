@@ -13,7 +13,7 @@ Map::Map()
 
     sprite.setTextureRect(sf::IntRect(
         sf::Vector2i(0, 0),
-        sf::Vector2i(10000, 10000)
+        sf::Vector2i(static_cast<int>(worldSize), static_cast<int>(worldSize))
     ));
 
     sprite.setPosition({ 0.f, 0.f });
@@ -21,4 +21,8 @@ Map::Map()
 
 void Map::draw(sf::RenderWindow& window) {
     window.draw(sprite);
+}
+
+sf::Vector2f Map::getSize() const {
+    return { worldSize, worldSize };
 }

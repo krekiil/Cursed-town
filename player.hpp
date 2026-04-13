@@ -12,6 +12,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    void setPosition(const sf::Vector2f& position);
 
 private:
     sf::Texture texture;

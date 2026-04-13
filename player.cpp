@@ -15,7 +15,9 @@ Player::Player()
     , framesPerRow(3)
     , direction(Down)
 {
-    texture.loadFromFile("assets/player.png");
+    if (!texture.loadFromFile("assets/player.png")) {
+        // Keep running even if asset is missing; sprite will stay empty.
+    }
     textureImage = texture.copyToImage();
 
     rightRowOffsets = std::vector<int>(framesPerRow, 0);
@@ -23,7 +25,11 @@ Player::Player()
     sprite.setTexture(texture);
     sprite.setTextureRect(IntRect({ 0, 0 }, frameSize));
     sprite.setOrigin(sf::Vector2f(frameSize.x / 2.f, frameSize.y / 2.f));
-    sprite.setPosition({ 960.f, 540.f });
+    const sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sprite.setPosition({
+        desktop.size.x / 2.f,
+        desktop.size.y / 2.f
+    });
 }
 
 void Player::handleInput(float dt) {
@@ -47,7 +53,10 @@ void Player::handleInput(float dt) {
         direction = Left;
         isMoving = true;
         sprite.setScale({ -1.f, 1.f });
-		sprite.setOrigin({ frameSize.x, frameSize.y});
+        sprite.setOrigin(sf::Vector2f(
+            static_cast<float>(frameSize.x),
+            static_cast<float>(frameSize.y)
+        ));
     }
 
     if (Keyboard::isKeyPressed(Keyboard::Key::D)) {
@@ -55,7 +64,7 @@ void Player::handleInput(float dt) {
         direction = Right;
         isMoving = true;
         sprite.setScale({ 1.f, 1.f });
-        sprite.setOrigin({0.f, frameSize.y });
+        sprite.setOrigin(sf::Vector2f(0.f, static_cast<float>(frameSize.y)));
     }
 
     sprite.move(movement);
@@ -109,4 +118,8 @@ void Player::draw(sf::RenderWindow& window) {
 }
 sf::Vector2f Player::getPosition() const {
     return sprite.getPosition();
+}
+
+void Player::setPosition(const sf::Vector2f& position) {
+    sprite.setPosition(position);
 }
