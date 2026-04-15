@@ -53,10 +53,6 @@ void Player::handleInput(float dt) {
         direction = Left;
         isMoving = true;
         sprite.setScale({ -1.f, 1.f });
-        sprite.setOrigin(sf::Vector2f(
-            static_cast<float>(frameSize.x),
-            static_cast<float>(frameSize.y)
-        ));
     }
 
     if (Keyboard::isKeyPressed(Keyboard::Key::D)) {
@@ -64,7 +60,6 @@ void Player::handleInput(float dt) {
         direction = Right;
         isMoving = true;
         sprite.setScale({ 1.f, 1.f });
-        sprite.setOrigin(sf::Vector2f(0.f, static_cast<float>(frameSize.y)));
     }
 
     sprite.move(movement);

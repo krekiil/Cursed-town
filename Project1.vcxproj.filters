@@ -27,6 +27,9 @@
     <ClCompile Include="map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zombie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.hpp">
@@ -38,9 +41,18 @@
     <ClInclude Include="map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zombie.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Player.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\map.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\zombie.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

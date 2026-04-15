@@ -143,14 +143,18 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="zombie.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="map.hpp" />
     <ClInclude Include="game.hpp" />
     <ClInclude Include="player.hpp" />
+    <ClInclude Include="zombie.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\map.png" />
     <Image Include="assets\Player.png" />
+    <Image Include="assets\zombie.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
