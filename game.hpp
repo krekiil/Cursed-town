@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <cstddef>
+#include <optional>
 #include <random>
 #include <vector>
 #include "Player.hpp"
@@ -19,6 +20,7 @@ private:
     void render();
     void updateZombies(float dt);
     void spawnZombie();
+    void updateHealthBar();
 
     sf::RenderWindow window;
     sf::Clock clock;
@@ -30,6 +32,13 @@ private:
     float spawnTimer;
     float spawnInterval;
     std::size_t maxZombies;
+    float currentHealth;
+    float maxHealth;
+    sf::RectangleShape healthBarBackground;
+    sf::RectangleShape healthBarFill;
+    sf::Font hudFont;
+    std::optional<sf::Text> healthBarText;
+    bool isHudFontLoaded;
     std::mt19937 randomEngine;
     std::uniform_real_distribution<float> angleDistribution;
     std::uniform_real_distribution<float> radiusDistribution;

@@ -1,8 +1,9 @@
 #include "Game.hpp"
+#include <SFML/Config.hpp>
 #include <algorithm>
 #include <cmath>
-#include <optional>
 #include <random>
+#include <string>
 #include <utility>
 
 using namespace sf;
@@ -13,6 +14,9 @@ Game::Game()
     , spawnTimer(0.f)
     , spawnInterval(1.f)
     , maxZombies(200)
+    , currentHealth(100.f)
+    , maxHealth(100.f)
+    , isHudFontLoaded(false)
     , randomEngine(std::random_device{}())
     , angleDistribution(0.f, 2.f * 3.14159265f)
     , radiusDistribution(450.f, 700.f)
@@ -23,6 +27,41 @@ Game::Game()
     player.setPosition(mapCenter);
     view.setCenter(mapCenter);
     zombies.reserve(maxZombies);
+
+    healthBarBackground.setSize({ 260.f, 24.f });
+    healthBarBackground.setPosition({ 20.f, 20.f });
+    healthBarBackground.setFillColor(Color(40, 40, 40, 220));
+    healthBarBackground.setOutlineThickness(2.f);
+    healthBarBackground.setOutlineColor(Color::White);
+
+    healthBarFill.setSize({ 252.f, 16.f });
+    healthBarFill.setPosition({ 24.f, 24.f });
+    healthBarFill.setFillColor(Color(220, 40, 40));
+
+#if SFML_VERSION_MAJOR >= 3
+    isHudFontLoaded = hudFont.openFromFile("assets/arial.ttf");
+    if (!isHudFontLoaded) {
+        isHudFontLoaded = hudFont.openFromFile("C:/Windows/Fonts/arial.ttf");
+    }
+#else
+    isHudFontLoaded = hudFont.loadFromFile("assets/arial.ttf");
+    if (!isHudFontLoaded) {
+        isHudFontLoaded = hudFont.loadFromFile("C:/Windows/Fonts/arial.ttf");
+    }
+#endif
+
+    if (isHudFontLoaded) {
+#if SFML_VERSION_MAJOR >= 3
+        healthBarText.emplace(hudFont);
+#else
+        healthBarText.emplace();
+        healthBarText->setFont(hudFont);
+#endif
+        healthBarText->setCharacterSize(16);
+        healthBarText->setFillColor(Color::White);
+    }
+
+    updateHealthBar();
 }
 
 void Game::run() {
@@ -36,11 +75,20 @@ void Game::run() {
 }
 
 void Game::processEvents() {
-    while (const std::optional<Event> event = window.pollEvent()) {
+#if SFML_VERSION_MAJOR >= 3
+    while (const auto event = window.pollEvent()) {
         if (event->is<Event::Closed>()) {
             window.close();
         }
     }
+#else
+    sf::Event event;
+    while (window.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window.close();
+        }
+    }
+#endif
 }
 
 void Game::update(float dt) {
@@ -108,6 +156,42 @@ void Game::spawnZombie() {
     }
 }
 
+void Game::updateHealthBar() {
+    const float normalizedHealth = (maxHealth > 0.f)
+        ? std::clamp(currentHealth / maxHealth, 0.f, 1.f)
+        : 0.f;
+
+    const float maxFillWidth = 252.f;
+    healthBarFill.setSize({ maxFillWidth * normalizedHealth, 16.f });
+
+    if (isHudFontLoaded && healthBarText.has_value()) {
+        const int hpNow = static_cast<int>(std::round(currentHealth));
+        const int hpMax = static_cast<int>(std::round(maxHealth));
+        healthBarText->setString("HP: " + std::to_string(hpNow) + "/" + std::to_string(hpMax));
+
+        const sf::FloatRect textBounds = healthBarText->getLocalBounds();
+        const sf::Vector2f barPos = healthBarBackground.getPosition();
+        const sf::Vector2f barSize = healthBarBackground.getSize();
+
+#if SFML_VERSION_MAJOR >= 3
+        const float textWidth = textBounds.size.x;
+        const float textHeight = textBounds.size.y;
+        const float textOffsetX = textBounds.position.x;
+        const float textOffsetY = textBounds.position.y;
+#else
+        const float textWidth = textBounds.width;
+        const float textHeight = textBounds.height;
+        const float textOffsetX = textBounds.left;
+        const float textOffsetY = textBounds.top;
+#endif
+
+        healthBarText->setPosition({
+            barPos.x + (barSize.x - textWidth) * 0.5f - textOffsetX,
+            barPos.y + (barSize.y - textHeight) * 0.5f - textOffsetY
+        });
+    }
+}
+
 void Game::render() {
     window.clear();
     window.setView(view);
@@ -116,5 +200,13 @@ void Game::render() {
         zombie.draw(window);
     }
     player.draw(window);
+
+    window.setView(window.getDefaultView());
+    window.draw(healthBarBackground);
+    window.draw(healthBarFill);
+    if (isHudFontLoaded && healthBarText.has_value()) {
+        window.draw(*healthBarText);
+    }
+
     window.display();
 }
