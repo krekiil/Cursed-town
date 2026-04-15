@@ -16,7 +16,6 @@ Player::Player()
     , direction(Down)
 {
     if (!texture.loadFromFile("assets/player.png")) {
-        // Keep running even if asset is missing; sprite will stay empty.
     }
     textureImage = texture.copyToImage();
 
