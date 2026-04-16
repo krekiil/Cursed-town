@@ -21,6 +21,9 @@ private:
     void updateZombies(float dt);
     void spawnZombie();
     void updateHealthBar();
+    bool isPlayerCollidingWithAnyZombie() const;
+    bool pushPlayerOutOfZombies();
+    bool isGameOver;
 
     sf::RenderWindow window;
     sf::Clock clock;
@@ -39,6 +42,10 @@ private:
     sf::Font hudFont;
     std::optional<sf::Text> healthBarText;
     bool isHudFontLoaded;
+    float contactDamage;
+    float damageTickInterval;
+    float damageTickTimer;
+    float hitKnockbackDistance;
     std::mt19937 randomEngine;
     std::uniform_real_distribution<float> angleDistribution;
     std::uniform_real_distribution<float> radiusDistribution;

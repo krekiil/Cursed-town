@@ -117,3 +117,7 @@ sf::Vector2f Player::getPosition() const {
 void Player::setPosition(const sf::Vector2f& position) {
     sprite.setPosition(position);
 }
+
+sf::FloatRect Player::getBounds() const {
+    return sprite.getGlobalBounds();
+}

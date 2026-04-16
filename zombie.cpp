@@ -111,3 +111,7 @@ bool Zombie::isValid() const {
 sf::Vector2f Zombie::getPosition() const {
     return sprite.getPosition();
 }
+
+sf::FloatRect Zombie::getBounds() const {
+    return sprite.getGlobalBounds();
+}

@@ -8,18 +8,72 @@
 
 using namespace sf;
 
+namespace {
+float rectLeft(const sf::FloatRect& rect) {
+#if SFML_VERSION_MAJOR >= 3
+    return rect.position.x;
+#else
+    return rect.left;
+#endif
+}
+
+float rectTop(const sf::FloatRect& rect) {
+#if SFML_VERSION_MAJOR >= 3
+    return rect.position.y;
+#else
+    return rect.top;
+#endif
+}
+
+float rectWidth(const sf::FloatRect& rect) {
+#if SFML_VERSION_MAJOR >= 3
+    return rect.size.x;
+#else
+    return rect.width;
+#endif
+}
+
+float rectHeight(const sf::FloatRect& rect) {
+#if SFML_VERSION_MAJOR >= 3
+    return rect.size.y;
+#else
+    return rect.height;
+#endif
+}
+
+sf::Vector2f rectCenter(const sf::FloatRect& rect) {
+    return {
+        rectLeft(rect) + rectWidth(rect) * 0.5f,
+        rectTop(rect) + rectHeight(rect) * 0.5f
+    };
+}
+
+bool intersectsRect(const sf::FloatRect& lhs, const sf::FloatRect& rhs) {
+#if SFML_VERSION_MAJOR >= 3
+    return lhs.findIntersection(rhs).has_value();
+#else
+    return lhs.intersects(rhs);
+#endif
+}
+}
+
 Game::Game()
     : window(sf::VideoMode::getDesktopMode(), "CursedTown", sf::Style::None)
     , view(window.getDefaultView())
     , spawnTimer(0.f)
-    , spawnInterval(1.f)
+    , spawnInterval(3.f)
     , maxZombies(200)
     , currentHealth(100.f)
     , maxHealth(100.f)
     , isHudFontLoaded(false)
+    , contactDamage(5.f)
+    , damageTickInterval(0.5f)
+    , damageTickTimer(0.5f)
+    , hitKnockbackDistance(30.f)
     , randomEngine(std::random_device{}())
     , angleDistribution(0.f, 2.f * 3.14159265f)
     , radiusDistribution(450.f, 700.f)
+    , isGameOver (false)
 {
     const sf::Vector2f mapSize = map.getSize();
     const sf::Vector2f mapCenter(mapSize.x * 0.5f, mapSize.y * 0.5f);
@@ -90,13 +144,69 @@ void Game::processEvents() {
     }
 #endif
 }
-
+    
 void Game::update(float dt) {
+    if (isGameOver) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {
+            currentHealth = maxHealth;
+            player.setPosition(map.getSize() * 0.5f);
+            zombies.clear();
+            isGameOver = false;
+            updateHealthBar();
+        }
+        return;
+    }
     player.handleInput(dt);
     player.update(dt);
-    updateZombies(dt);
-
+    sf::Vector2f pos = player.getPosition();
+    sf::FloatRect bounds = player.getBounds();
     const sf::Vector2f mapSize = map.getSize();
+
+    float halfWidth = bounds.size.x * 0.5f;
+    float halfHeight = bounds.size.y * 0.5f;
+
+    pos.x = std::clamp(pos.x, halfWidth, mapSize.x - halfWidth);
+    pos.y = std::clamp(pos.y, halfHeight, mapSize.y - halfHeight);
+
+    player.setPosition(pos);
+    player.setPosition(pos);
+    updateZombies(dt);
+    const bool wasColliding = pushPlayerOutOfZombies();
+
+    damageTickTimer += dt;
+    if (wasColliding && damageTickTimer >= damageTickInterval) {
+        currentHealth = std::max(0.f, currentHealth - contactDamage);
+        damageTickTimer = 0.f;
+        if (currentHealth <= 0.f) {
+            isGameOver = true;
+        }
+        sf::Vector2f knockbackDirection(0.f, 0.f);
+        const sf::FloatRect playerBounds = player.getBounds();
+        const sf::Vector2f playerCenter = rectCenter(playerBounds);
+        for (const Zombie& zombie : zombies) {
+            const sf::FloatRect zombieBounds = zombie.getBounds();
+            if (!intersectsRect(playerBounds, zombieBounds)) {
+                continue;
+            }
+
+            sf::Vector2f away = playerCenter - rectCenter(zombieBounds);
+            const float len = std::sqrt(away.x * away.x + away.y * away.y);
+            if (len > 0.001f) {
+                away /= len;
+                knockbackDirection += away;
+            }
+        }
+
+        const float knockLen = std::sqrt(knockbackDirection.x * knockbackDirection.x + knockbackDirection.y * knockbackDirection.y);
+        if (knockLen > 0.001f) {
+            knockbackDirection /= knockLen;
+            player.setPosition(player.getPosition() + knockbackDirection * hitKnockbackDistance);
+            pushPlayerOutOfZombies();
+        }
+            
+        updateHealthBar();
+    }
+
     const sf::Vector2f halfView = view.getSize() * 0.5f;
     const sf::Vector2f playerPos = player.getPosition();
 
@@ -192,6 +302,60 @@ void Game::updateHealthBar() {
     }
 }
 
+bool Game::isPlayerCollidingWithAnyZombie() const {
+    const sf::FloatRect playerBounds = player.getBounds();
+    for (const Zombie& zombie : zombies) {
+        if (intersectsRect(playerBounds, zombie.getBounds())) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Game::pushPlayerOutOfZombies() {
+    bool collided = false;
+
+    for (int iteration = 0; iteration < 3; ++iteration) {
+        bool movedThisIteration = false;
+        const sf::FloatRect playerBounds = player.getBounds();
+        const sf::Vector2f playerCenter = rectCenter(playerBounds);
+
+        for (const Zombie& zombie : zombies) {
+            const sf::FloatRect zombieBounds = zombie.getBounds();
+            if (!intersectsRect(playerBounds, zombieBounds)) {
+                continue;
+            }
+
+            collided = true;
+            movedThisIteration = true;
+
+            const sf::Vector2f zombieCenter = rectCenter(zombieBounds);
+            sf::Vector2f delta = playerCenter - zombieCenter;
+
+            const float overlapX = (rectWidth(playerBounds) * 0.5f + rectWidth(zombieBounds) * 0.5f) - std::fabs(delta.x);
+            const float overlapY = (rectHeight(playerBounds) * 0.5f + rectHeight(zombieBounds) * 0.5f) - std::fabs(delta.y);
+
+            sf::Vector2f correction(0.f, 0.f);
+            if (overlapX < overlapY) {
+                correction.x = (delta.x >= 0.f ? overlapX : -overlapX);
+            }
+            else {
+                correction.y = (delta.y >= 0.f ? overlapY : -overlapY);
+            }
+
+            player.setPosition(player.getPosition() + correction);
+            break;
+        }
+
+        if (!movedThisIteration) {
+            break;
+        }
+    }
+
+    return collided;
+}
+
 void Game::render() {
     window.clear();
     window.setView(view);
@@ -207,6 +371,28 @@ void Game::render() {
     if (isHudFontLoaded && healthBarText.has_value()) {
         window.draw(*healthBarText);
     }
+    if (isGameOver && isHudFontLoaded) {
+        sf::Text gameOverText(hudFont);
+        gameOverText.setString("  GAME OVER\n Press R to respawn");
+        gameOverText.setCharacterSize(48);
+        gameOverText.setFillColor(sf::Color::Red);
 
+        sf::FloatRect bounds = gameOverText.getLocalBounds();
+
+#if SFML_VERSION_MAJOR >= 3
+        float width = bounds.size.x;
+        float height = bounds.size.y;
+#else
+        float width = bounds.width;
+        float height = bounds.height;
+#endif
+
+        gameOverText.setPosition({
+            window.getSize().x / 2.f - width / 2.f,
+            window.getSize().y / 2.f - height / 2.f
+            });
+
+        window.draw(gameOverText);
+    }
     window.display();
 }

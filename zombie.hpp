@@ -11,6 +11,7 @@ public:
     void draw(sf::RenderWindow& window) const;
     bool isValid() const;
     sf::Vector2f getPosition() const;
+    sf::FloatRect getBounds() const;
 
 private:
     static sf::Texture sharedTexture;
