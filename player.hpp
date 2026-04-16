@@ -6,7 +6,6 @@
 class Player {
 public:
     Player();
-
     void handleInput(float dt);
     void update(float dt);
     void draw(sf::RenderWindow& window);
@@ -25,7 +24,6 @@ private:
 
     float speed;
     bool isMoving;
-
     sf::Vector2i frameSize;
     sf::Vector2i frameSpacing;
 

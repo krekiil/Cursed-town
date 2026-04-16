@@ -55,5 +55,8 @@
     <Image Include="assets\zombie.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\a0b4c3da-2def-4cd2-9b29-828f7d5e5461.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

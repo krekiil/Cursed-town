@@ -5,7 +5,9 @@
 sf::Texture Zombie::sharedTexture;
 sf::Image Zombie::sharedTextureImage;
 bool Zombie::textureReady = false;
-
+void Zombie::setPosition(const sf::Vector2f& pos) {
+    sprite.setPosition(pos);
+}
 Zombie::Zombie(const sf::Vector2f& startPosition)
     : sprite(sharedTexture)
     , currentFrame(0)
@@ -22,37 +24,44 @@ Zombie::Zombie(const sf::Vector2f& startPosition)
         textureReady = sharedTexture.loadFromFile("assets/zombie.png");
         if (textureReady) {
             sharedTextureImage = sharedTexture.copyToImage();
+
         }
     }
 
     rightRowOffsets = std::vector<int>(framesPerRow, 0);
 
     sprite.setTexture(sharedTexture);
+
     sprite.setTextureRect(sf::IntRect({ 0, 0 }, frameSize));
     sprite.setOrigin({ frameSize.x * 0.5f, frameSize.y * 0.5f });
     sprite.setPosition(startPosition);
 }
 
-void Zombie::update(float dt, const sf::Vector2f& targetPosition) {
-    if (!isValid()) {
+void Zombie::update(float dt, const sf::Vector2f& targetPosition)
+{
+    if (!isValid())
         return;
-    }
 
     sf::Vector2f delta = targetPosition - sprite.getPosition();
-    const float length = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+    float length = std::sqrt(delta.x * delta.x + delta.y * delta.y);
 
     isMoving = false;
-    if (length < 0.001f) {
+
+    if (length < 0.001f)
+    {
         currentFrame = 0;
         animationTimer = 0.f;
     }
-    else {
+    else
+    {
         isMoving = true;
 
-        if (std::fabs(delta.x) > std::fabs(delta.y)) {
+        if (std::fabs(delta.x) > std::fabs(delta.y))
+        {
             direction = (delta.x < 0.f) ? Left : Right;
         }
-        else {
+        else
+        {
             direction = (delta.y < 0.f) ? Up : Down;
         }
 
@@ -60,44 +69,45 @@ void Zombie::update(float dt, const sf::Vector2f& targetPosition) {
         sprite.move(delta * speed * dt);
     }
 
-    if (direction == Left) {
-        sprite.setScale({ -1.f, 1.f });
-    }
-    else {
-        sprite.setScale({ 1.f, 1.f });
-    }
-
-    if (isMoving) {
+    if (isMoving)
+    {
         animationTimer += dt;
-        if (animationTimer >= animationSpeed) {
+
+        if (animationTimer >= animationSpeed)
+        {
             animationTimer = 0.f;
             currentFrame++;
-            if (currentFrame >= framesPerRow) {
+
+            if (currentFrame >= framesPerRow)
                 currentFrame = 0;
-            }
         }
     }
-    else {
+    else
+    {
         currentFrame = 0;
     }
 
     int row = 0;
-    switch (direction) {
-    case Down: row = 0; break;
-    case Up: row = 1; break;
-    case Left: row = 2; break;
-    case Right: row = 2; break;
+
+    switch (direction)
+    {
+    case Down:  row = 0; break;
+    case Up:    row = 1; break;
+    case Left:  row = 2; break;
+    case Right: row = 3; break;
     }
 
     int top = row * (frameSize.y + frameSpacing.y);
-    if (direction == Right && currentFrame >= 0 && currentFrame < static_cast<int>(rightRowOffsets.size())) {
-        top += rightRowOffsets[currentFrame];
-    }
 
-    sprite.setTextureRect(sf::IntRect(
-        { currentFrame * (frameSize.x + frameSpacing.x), top },
+    sf::IntRect rect(
+        sf::Vector2i(
+            currentFrame * (frameSize.x + frameSpacing.x),
+            top
+        ),
         frameSize
-    ));
+    );
+
+    sprite.setTextureRect(rect);
 }
 
 void Zombie::draw(sf::RenderWindow& window) const {

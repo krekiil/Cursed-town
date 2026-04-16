@@ -24,6 +24,7 @@ private:
     bool isPlayerCollidingWithAnyZombie() const;
     bool pushPlayerOutOfZombies();
     bool isGameOver;
+    void resolveZombieCollisions();
 
     sf::RenderWindow window;
     sf::Clock clock;

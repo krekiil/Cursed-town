@@ -152,6 +152,7 @@
     <ClInclude Include="zombie.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\a0b4c3da-2def-4cd2-9b29-828f7d5e5461.png" />
     <Image Include="assets\map.png" />
     <Image Include="assets\Player.png" />
     <Image Include="assets\zombie.png" />

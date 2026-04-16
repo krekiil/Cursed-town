@@ -227,6 +227,7 @@ void Game::updateZombies(float dt) {
     for (Zombie& zombie : zombies) {
         zombie.update(dt, playerPos);
     }
+    resolveZombieCollisions();
 }
 
 void Game::spawnZombie() {
@@ -354,6 +355,42 @@ bool Game::pushPlayerOutOfZombies() {
     }
 
     return collided;
+}
+void Game::resolveZombieCollisions() {
+    for (size_t i = 0; i < zombies.size(); ++i) {
+        for (size_t j = i + 1; j < zombies.size(); ++j) {
+
+            sf::FloatRect aBounds = zombies[i].getBounds();
+            sf::FloatRect bBounds = zombies[j].getBounds();
+
+            if (!intersectsRect(aBounds, bBounds)) {
+                continue;
+            }
+
+            sf::Vector2f aCenter = rectCenter(aBounds);
+            sf::Vector2f bCenter = rectCenter(bBounds);
+
+            sf::Vector2f delta = aCenter - bCenter;
+
+            float distance = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+            if (distance < 0.001f) {
+                delta = { 1.f, 0.f };
+                distance = 1.f;
+            }
+
+            delta /= distance;
+
+            float overlapX = (rectWidth(aBounds) * 0.5f + rectWidth(bBounds) * 0.5f) - std::fabs(aCenter.x - bCenter.x);
+            float overlapY = (rectHeight(aBounds) * 0.5f + rectHeight(bBounds) * 0.5f) - std::fabs(aCenter.y - bCenter.y);
+
+            float push = std::min(overlapX, overlapY) * 0.5f;
+
+            sf::Vector2f correction = delta * push;
+
+            zombies[i].setPosition(zombies[i].getPosition() + correction);
+            zombies[j].setPosition(zombies[j].getPosition() - correction);
+        }
+    }
 }
 
 void Game::render() {

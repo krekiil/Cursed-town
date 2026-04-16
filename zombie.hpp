@@ -6,12 +6,12 @@
 class Zombie {
 public:
     Zombie(const sf::Vector2f& startPosition);
-
+    void setPosition(const sf::Vector2f& pos);
     void update(float dt, const sf::Vector2f& targetPosition);
     void draw(sf::RenderWindow& window) const;
     bool isValid() const;
     sf::Vector2f getPosition() const;
-    sf::FloatRect getBounds() const;
+    sf::FloatRect getBounds() const;    
 
 private:
     static sf::Texture sharedTexture;
