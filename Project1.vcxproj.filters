@@ -30,6 +30,15 @@
     <ClCompile Include="zombie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="weapon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XPOrb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.hpp">
@@ -44,6 +53,15 @@
     <ClInclude Include="zombie.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="weapon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XPOrb.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Player.png">
@@ -53,9 +71,6 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\zombie.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\a0b4c3da-2def-4cd2-9b29-828f7d5e5461.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -156,6 +156,22 @@ void Game::update(float dt) {
         }
         return;
     }
+    for (auto& p : projectiles)
+        p.update(dt);
+    for (auto& orb : xpOrbs)
+        orb.update(dt, player.getPosition());
+    for (auto& orb : xpOrbs) {
+        if (orb.getBounds().findIntersection(player.getBounds()).has_value()) {
+            player.addXP(10);
+        }
+    }
+    xpOrbs.erase(
+        std::remove_if(xpOrbs.begin(), xpOrbs.end(),
+            [&](const XPOrb& orb) {
+                return orb.getBounds().findIntersection(player.getBounds()).has_value();
+            }),
+        xpOrbs.end()
+    );
     player.handleInput(dt);
     player.update(dt);
     sf::Vector2f pos = player.getPosition();
@@ -231,6 +247,51 @@ void Game::updateZombies(float dt) {
 }
 
 void Game::spawnZombie() {
+    Weapon& weapon = player.getWeapon();
+
+    if (weapon.canAttack()) {
+        Zombie* closest = nullptr;
+        float minDistSq = 999999.f;
+
+        for (auto& z : zombies) {
+            if (!z.isAlive()) continue;
+
+            sf::Vector2f d = z.getPosition() - player.getPosition();
+            float distSq = d.x * d.x + d.y * d.y;
+
+            if (distSq < minDistSq) {
+                minDistSq = distSq;
+                closest = &z;
+            }
+        }
+
+        sf::Vector2f dir = closest->getPosition() - player.getPosition();
+        float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+
+        if (len > 0.001f) {
+            dir /= len;
+            projectiles.emplace_back(player.getPosition(), dir);
+            for (auto& p : projectiles) {
+                for (auto& z : zombies) {
+                    if (!z.isAlive()) continue;
+
+                    if (p.getBounds().findIntersection(z.getBounds()).has_value()) {
+                        z.takeDamage(player.getWeapon().getDamage());
+                        projectiles.erase(
+                            std::remove_if(projectiles.begin(), projectiles.end(),
+                                [](const Projectile& p) {
+                                    return !p.isAlive();
+                                }),
+                            projectiles.end()
+                        );
+                    }
+                }
+            }
+        }
+
+        weapon.resetCooldown();
+
+    }
     if (zombies.size() >= maxZombies) {
         const sf::Vector2f playerPos = player.getPosition();
         std::size_t farthestIndex = 0;
@@ -264,8 +325,20 @@ void Game::spawnZombie() {
     Zombie zombie(spawnPosition);
     if (zombie.isValid()) {
         zombies.push_back(std::move(zombie));
+        zombies.erase(
+            std::remove_if(zombies.begin(), zombies.end(),
+                [this](const Zombie& z) {
+                    if (!z.isAlive()) {
+                        xpOrbs.emplace_back(z.getPosition());
+                        return true;
+                    }
+                    return false;
+                }),
+            zombies.end()
+        );
     }
 }
+
 
 void Game::updateHealthBar() {
     const float normalizedHealth = (maxHealth > 0.f)
@@ -400,8 +473,11 @@ void Game::render() {
     for (const Zombie& zombie : zombies) {
         zombie.draw(window);
     }
+    for (auto& p : projectiles)
+        p.draw(window);
     player.draw(window);
-
+    for (auto& orb : xpOrbs)
+        orb.draw(window);
     window.setView(window.getDefaultView());
     window.draw(healthBarBackground);
     window.draw(healthBarFill);
@@ -414,7 +490,9 @@ void Game::render() {
         gameOverText.setCharacterSize(48);
         gameOverText.setFillColor(sf::Color::Red);
 
+
         sf::FloatRect bounds = gameOverText.getLocalBounds();
+
 
 #if SFML_VERSION_MAJOR >= 3
         float width = bounds.size.x;

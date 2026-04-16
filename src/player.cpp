@@ -14,6 +14,9 @@ Player::Player()
     , frameSpacing(50, 50)
     , framesPerRow(3)
     , direction(Down)
+    , xp(0)
+    , level(1)
+    , xpToNextLevel(100)
 {
 
     if (!texture.loadFromFile("assets/player.png")) {
@@ -72,6 +75,7 @@ void Player::handleInput(float dt)
 
 void Player::update(float dt)
 {
+    weapon.update(dt);
     if (isMoving)
     {
         animationTimer += dt;
@@ -126,4 +130,18 @@ void Player::setPosition(const sf::Vector2f& position) {
 
 sf::FloatRect Player::getBounds() const {
     return sprite.getGlobalBounds();
+}
+void Player::addXP(int amount) {
+    xp += amount;
+
+    while (xp >= xpToNextLevel) {
+        xp -= xpToNextLevel;
+        level++;
+        xpToNextLevel = static_cast<int>(xpToNextLevel * 1.5f);
+
+        speed += 20.f;
+    }
+}
+Weapon& Player::getWeapon() {
+    return weapon;
 }

@@ -8,6 +8,8 @@
 #include "Player.hpp"
 #include "Map.hpp"
 #include "zombie.hpp"
+#include "Projectile.hpp"
+#include "XPOrb.hpp"
 
 class Game {
 public:
@@ -29,6 +31,7 @@ private:
     sf::RenderWindow window;
     sf::Clock clock;
     sf::View view;
+    std::vector<XPOrb> xpOrbs;
 
     Player player;
     Map map;
@@ -50,4 +53,6 @@ private:
     std::mt19937 randomEngine;
     std::uniform_real_distribution<float> angleDistribution;
     std::uniform_real_distribution<float> radiusDistribution;
+    std::vector<Projectile> projectiles;
+
 };

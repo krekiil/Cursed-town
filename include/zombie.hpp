@@ -12,8 +12,11 @@ public:
     bool isValid() const;
     sf::Vector2f getPosition() const;
     sf::FloatRect getBounds() const;    
+    void takeDamage(float dmg);
+    bool isAlive() const;
 
 private:
+
     static sf::Texture sharedTexture;
     static sf::Image sharedTextureImage;
     static bool textureReady;
@@ -25,6 +28,9 @@ private:
     float animationSpeed;
     float speed;
     bool isMoving;
+    float health;
+    float maxHealth;
+    bool alive;
 
     sf::Vector2i frameSize;
     sf::Vector2i frameSpacing;

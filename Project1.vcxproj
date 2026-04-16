@@ -143,16 +143,21 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="weapon.cpp" />
+    <ClCompile Include="XPOrb.cpp" />
     <ClCompile Include="zombie.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="map.hpp" />
     <ClInclude Include="game.hpp" />
     <ClInclude Include="player.hpp" />
+    <ClInclude Include="Projectile.hpp" />
+    <ClInclude Include="weapon.hpp" />
+    <ClInclude Include="XPOrb.hpp" />
     <ClInclude Include="zombie.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\a0b4c3da-2def-4cd2-9b29-828f7d5e5461.png" />
     <Image Include="assets\map.png" />
     <Image Include="assets\Player.png" />
     <Image Include="assets\zombie.png" />

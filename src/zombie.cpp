@@ -19,6 +19,9 @@ Zombie::Zombie(const sf::Vector2f& startPosition)
     , frameSpacing(50, 50)
     , framesPerRow(3)
     , direction(Down)
+    , health(50.f)
+    , maxHealth(50.f)
+    , alive(true)
 {
     if (!textureReady) {
         textureReady = sharedTexture.loadFromFile("assets/zombie.png");
@@ -119,9 +122,19 @@ bool Zombie::isValid() const {
 }
 
 sf::Vector2f Zombie::getPosition() const {
-    return sprite.getPosition();
+    return sprite.getPosition();    
 }
 
 sf::FloatRect Zombie::getBounds() const {
     return sprite.getGlobalBounds();
+}
+void Zombie::takeDamage(float dmg) {
+    health -= dmg;
+    if (health <= 0.f) {
+        alive = false;
+    }
+}
+
+bool Zombie::isAlive() const {
+    return alive;
 }

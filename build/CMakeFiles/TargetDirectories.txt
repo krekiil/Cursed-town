@@ -1,0 +1,3 @@
+C:/Users/godus/OneDrive/Deutsch/Desktop/projects/Cursed-town/build/CMakeFiles/CursedTown.dir
+C:/Users/godus/OneDrive/Deutsch/Desktop/projects/Cursed-town/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/godus/OneDrive/Deutsch/Desktop/projects/Cursed-town/build/CMakeFiles/ZERO_CHECK.dir
